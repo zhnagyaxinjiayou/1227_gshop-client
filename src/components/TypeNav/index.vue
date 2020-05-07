@@ -1,0 +1,340 @@
+<template>
+  <div class="type-nav">
+    <div class="container">
+      <div @mouseleave="hideCategorys" @mouseenter="showCategorys">
+        <h2 class="all">全部商品分类</h2>
+        <transition name="move">
+          <!-- 一旦有transition标签，vue会在显示/隐藏的过程中向div指定特定类名 -->
+          <div class="sort" v-show="isShowFirst">
+            <div class="all-sort-list2" @click="toSearch">
+              <!-- @mouseenter="showSubCategorys(index)"告诉触发事件的是哪个div -->
+              <div
+                class="item"
+                v-for="(c1, index) in categoryList"
+                :key="c1.categoryId"
+                :class="{ item_on: index === currentIndex }"
+                @mouseenter="showSubCategorys(index)"
+              >
+                <h3>
+                  <a
+                    href="javascript:"
+                    :data-categoryName="c1.categoryName"
+                    :data-category1Id="c1.categoryId"
+                    >{{ c1.categoryName }}</a
+                  >
+                  <!-- :to是一个动态的值 -->
+                  <!-- 使用声明式路由导航 ，导致页面卡顿显示缓慢，每个分类项都会渲染导致上百个router-link -->
+
+                  <!-- <router-link
+                  :to="
+                    `/search?categoryName=${c1.categoryName}&category1Id=${c1.categoryId}`
+                  "
+                  >{{ c1.categoryName }}</router-link -->
+                  >
+                </h3>
+                <div class="item-list clearfix">
+                  <div class="subitem">
+                    <dl
+                      class="fore"
+                      v-for="c2 in c1.categoryChild"
+                      :key="c2.categoryId"
+                    >
+                      <dt>
+                        <a
+                          href="javascript:"
+                          :data-categoryName="c2.categoryName"
+                          :data-category2Id="c2.categoryId"
+                          >{{ c2.categoryName }}</a
+                        >
+
+                        <!-- <router-link
+                        :to="
+                          `/search?categoryName=${c2.categoryName}&category1Id=${c2.categoryId}`
+                        "
+                        >{{ c2.categoryName }}</router-link
+                      > -->
+                      </dt>
+                      <dd>
+                        <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
+                          <a
+                            href="javascript:"
+                            :data-categoryName="c3.categoryName"
+                            :data-category3Id="c3.categoryId"
+                            >{{ c3.categoryName }}</a
+                          >
+
+                          <!-- <router-link
+                          :to="
+                            `/search?categoryName=${c3.categoryName}&category1Id=${c3.categoryId}`
+                          "
+                          >{{ c3.categoryName }}</router-link
+                        > -->
+                        </em>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
+      <nav class="nav">
+        <a href="###">服装城</a>
+        <a href="###">美妆馆</a>
+        <a href="###">尚品汇超市</a>
+        <a href="###">全球购</a>
+        <a href="###">闪购</a>
+        <a href="###">团购</a>
+        <a href="###">有趣</a>
+        <a href="###">秒杀</a>
+      </nav>
+    </div>
+  </div>
+</template>
+
+<script>
+// import _ from "lodash";//引入整个lodash文件很大
+import throttle from "lodash/throttle"; //只引入需要的工具函数即可
+import { mapState } from "vuex";
+export default {
+  name: "TypeNav",
+
+  data() {
+    return {
+      currentIndex: -2, //需要显示字列表的一级分类项
+      isShowFirst: false, //是否显示一级列表
+    };
+  },
+
+  computed: {
+    ...mapState({
+      // 计算属性值由vuex内部调用此回调函数(传入总state)得到返回值作为属性值
+      // state: store的总状态
+      categoryList: (state) => state.home.baseCategoryList,
+    }),
+  },
+
+  // 在显示之前调用,执行同步操作更新数据
+  beforeMount() {
+    // 判断当前请求是首页？当前请求的路径是否是/，如果是一级列表就显示，否则就隐藏
+    this.isShowFirst = this.$route.path === "/";
+  },
+  // 操作同步数据后更新数据
+  // mounted() {
+  //   // 通过异步action获取异步获取数据到vuex的state中
+  //   this.$store.dispatch("getBaseCategoryList");
+  // },
+  methods: {
+    // 显示分类列表
+    showCategorys() {
+      this.currentIndex = -1;
+      this.isShowFirst = true;
+    },
+
+    // 隐藏分类列表
+    hideCategorys() {
+      this.currentIndex = -2;
+      // 如果不是首页隐藏一级列表
+      if (this.$route.path !== "/") {
+        this.isShowFirst = false;
+      }
+    },
+
+    // 显示指定下标的子分类
+    // 函数节流，
+    // showSubCategorys: _.throttle(function(index) {//引入整个lodash的用法
+    // 只引入需要的lodash(按需引入，打包文件减少1.4M)
+    showSubCategorys: throttle(function(index) {
+      if (this.currentIndex === -2) return; //如果已经完全移出去了就不做更新
+
+      // 更新需要显示子分类的下标
+      this.currentIndex = index;
+
+      // console.log("showSubCategorys", index);
+      // 更新数据会导致列表更新（浏览器在更新过程中没办法响应后面的mouseenter)=>其实是页面的卡顿
+      this.currentIndex = index;
+      // 理想：不去特别频繁的更新数据（更新页面）结果效果类似
+    }, 300),
+
+    // 点击分类项，跳转到搜索界面
+    toSearch(event) {
+      const {
+        categoryname,
+        category1id,
+        category2id,
+        category3id,
+      } = event.target.dataset;
+      // 如何判断点击的分类项<a>
+      if (categoryname) {
+        // 准备query参数
+        const query = { categoryName: categoryname };
+        if (category1id) {
+          query.category1Id = category1id;
+        } else if (category2id) {
+          query.category2Id = category2id;
+        } else if (category3id) {
+          query.category3Id = category3id;
+        }
+
+        // 用于路由跳转的location对象
+        const location = {
+          name: "search",
+          query,
+        };
+        //根据分类搜索时，也携带搜索关键字params参数
+        const { keyword } = this.$route.params;
+        // 得到当前的params参数对象
+        if (keyword) {
+          location.params = { keyword };
+        }
+
+        // 跳转search
+        this.$router.push(location);
+        // 隐藏一级列表
+        this.hideCategorys();
+      }
+
+      // // tagName标签名
+      // console.log(element, element.tagName, element.dataset);
+      // // 绑定事件监听是绑定在了父元素上，响应事件是发生在某一个子元素上，要知道是哪个 子元素
+      // if (element.tagName.toUpperCase() === "A") {
+      //   this.$store;
+      // }
+    },
+  },
+};
+</script>
+
+<style lang="less" scoped>
+.type-nav {
+  border-bottom: 2px solid #e1251b;
+
+  .container {
+    width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    position: relative;
+
+    .all {
+      width: 210px;
+      height: 45px;
+      background-color: #e1251b;
+      line-height: 45px;
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .nav {
+      a {
+        height: 45px;
+        margin: 0 22px;
+        line-height: 45px;
+        font-size: 16px;
+        color: #333;
+      }
+    }
+
+    .sort {
+      position: absolute;
+      left: 0;
+      top: 45px;
+      width: 210px;
+      height: 461px;
+      position: absolute;
+      background: #fafafa;
+      z-index: 999;
+
+      // 显示过渡样式
+      &.move-enter-active {
+        transition: all 0.5s;
+      }
+      // 隐藏时的样式
+      &.move-enter {
+        opacity: 0;
+        height: 0;
+      }
+
+      .all-sort-list2 {
+        .item {
+          h3 {
+            line-height: 30px;
+            font-size: 14px;
+            font-weight: 400;
+            overflow: hidden;
+            padding: 0 20px;
+            margin: 0;
+
+            a {
+              color: #333;
+            }
+          }
+
+          .item-list {
+            display: none;
+            position: absolute;
+            width: 734px;
+            min-height: 460px;
+            background: #f7f7f7;
+            left: 210px;
+            border: 1px solid #ddd;
+            top: 0;
+            z-index: 9999 !important;
+
+            .subitem {
+              float: left;
+              width: 650px;
+              padding: 0 4px 0 8px;
+
+              dl {
+                border-top: 1px solid #eee;
+                padding: 6px 0;
+                overflow: hidden;
+                zoom: 1;
+
+                &.fore {
+                  border-top: 0;
+                }
+
+                dt {
+                  float: left;
+                  width: 54px;
+                  line-height: 22px;
+                  text-align: right;
+                  padding: 3px 6px 0 0;
+                  font-weight: 700;
+                }
+
+                dd {
+                  float: left;
+                  width: 550px;
+                  padding: 3px 0 0;
+                  overflow: hidden;
+
+                  em {
+                    float: left;
+                    height: 14px;
+                    line-height: 14px;
+                    padding: 0 8px;
+                    margin-top: 5px;
+                    border-left: 1px solid #ccc;
+                  }
+                }
+              }
+            }
+          }
+
+          &.item_on {
+            background: #ccc;
+            .item-list {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</style>

@@ -90,12 +90,18 @@ export default {
         });
       }*/
 
-      // 对象写法2
-      this.$router.push({
+      const location = {
         name: "search",
-        params: { keyword: keyword === "" ? undefined : keyword },
-        query: { keyword2: keyword.toUpperCase() },
-      });
+      };
+      // 如果keywod有值，指定params
+      if (keyword) {
+        location.params = { keyword };
+      }
+      // 同时还要携带当前原本的query
+      const { query } = this.$route;
+      location.query = query;
+      // 跳转到Search
+      this.$router.push(location);
     },
   },
 };

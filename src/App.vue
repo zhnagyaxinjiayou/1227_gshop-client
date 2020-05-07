@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app">
     <Header />
     <!-- 显示当前配置的路由 -->
     <router-view></router-view>
@@ -12,9 +12,26 @@
 <script>
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+// import { reqBaseCategoryList, reqLogin } from "@/api";
+import { reqFloors } from "@/api";
 export default {
   name: "APP",
+
+  async mounted() {
+    // 测试接口请求函数
+    // const result = await reqBaseCategoryList();
+    // console.log("result", result);
+    // const result2 = await reqLogin("13700000000", "111111");
+    // console.log("result2", result2);
+    // console.log(this.$store.state);
+    //  测试使用mock接口 对应的接口请函数
+    const result = await reqFloors();
+    console.log("mock result", result);
+
+    //通过异步action获取异步获取数据到vuex的state中
+    this.$store.dispatch("getBaseCategoryList");
+  },
+
   components: {
     Header,
     Footer,

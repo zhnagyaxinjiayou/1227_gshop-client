@@ -25,8 +25,11 @@ export default {
     // console.log("result2", result2);
     // console.log(this.$store.state);
     //  测试使用mock接口 对应的接口请函数
-    const result = await reqFloors();
-    console.log("mock result", result);
+    // const result = await reqFloors();
+    // console.log("mock result", result);
+    // 测试针对muck接口的vuex代码
+    this.$store.dispatch("getFloors");
+    this.$store.dispatch("getBanners");
 
     //通过异步action获取异步获取数据到vuex的state中
     this.$store.dispatch("getBaseCategoryList");

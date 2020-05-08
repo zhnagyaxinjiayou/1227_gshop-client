@@ -2,8 +2,8 @@
   <div class="list-container">
     <div class="sortList clearfix">
       <div class="center">
-        <!--banner轮播-->
-        <div class="swiper-container" id="mySwiper">
+        <!-- banner轮播 -->
+        <div class="swiper-container">
           <div class="swiper-wrapper">
             <div class="swiper-slide">
               <img src="./images/banner1.jpg" />
@@ -91,8 +91,36 @@
 </template>
 
 <script>
+// 引入swiper
+import Swiper from "swiper";
+// 引入样式
+import "swiper/css/swiper.min.css";
+
 export default {
   name: "ListContainer",
+
+  // 初始显示界面后立即执行
+  mounted() {
+    // 创建Swiper实例对象：必须在列表数据显示之后创建才有正常轮播效果
+    // .swiper-container选择器（实现Swiper代码的根元素是谁）
+    new Swiper(".swiper-container", {
+      // direction: "vertical", // 垂直切换选项
+      // direction: "horizontal", // 水平切换，默认就是这个值
+
+      loop: true, // 循环模式选项
+      // swiper代码
+      // 如果需要分页器
+      pagination: {
+        el: ".swiper-pagination",
+      },
+
+      // 如果需要前进后退按钮
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+    });
+  },
 };
 </script>
 

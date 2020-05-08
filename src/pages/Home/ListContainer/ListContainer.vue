@@ -3,19 +3,7 @@
     <div class="sortList clearfix">
       <div class="center">
         <!-- banner轮播 -->
-        <div class="swiper-container">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <img src="./images/banner1.jpg" />
-            </div>
-          </div>
-          <!-- 如果需要分页器 -->
-          <div class="swiper-pagination"></div>
-
-          <!-- 如果需要导航按钮 -->
-          <div class="swiper-button-prev"></div>
-          <div class="swiper-button-next"></div>
-        </div>
+        <Carousel :carouselList="banners" />
       </div>
       <div class="right">
         <div class="news">
@@ -91,37 +79,36 @@
 </template>
 
 <script>
-// 引入swiper
-import Swiper from "swiper";
-// 引入样式
-import "swiper/css/swiper.min.css";
+// vue组件直接读取事件源里的数据
+import { mapState } from "vuex";
 
 export default {
   name: "ListContainer",
 
-  // 初始显示界面后立即执行
-  mounted() {
-    // 创建Swiper实例对象：必须在列表数据显示之后创建才有正常轮播效果
-    // .swiper-container选择器（实现Swiper代码的根元素是谁）
-    new Swiper(".swiper-container", {
-      // direction: "vertical", // 垂直切换选项
-      // direction: "horizontal", // 水平切换，默认就是这个值
-
-      loop: true, // 循环模式选项
-      // swiper代码
-      // 如果需要分页器
-      pagination: {
-        el: ".swiper-pagination",
-      },
-
-      // 如果需要前进后退按钮
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
-    });
+  computed: {
+    // vue组件直接读取事件源里的数据
+    ...mapState({
+      banners: (state) => state.home.banners,
+    }),
   },
 };
+
+// watch: {
+//   // 监视banners变化的回调函数，当banners从[]变为[...],
+//   // 注意：默认初始值不调用，只有数据变化时才调用
+
+// },
+
+// 初始显示界面后立即执行
+// mounted() {
+//   // 办法一：显示轮播图片(watch)使用延迟定时器延迟一定的时间才去创建，=>不适合，因为请求获取的时间是不定的
+//   // setTimeout(() => {
+//   //   this.initSwiper();
+//   // }, 1000);
+// },
+//   methods: {
+
+// };
 </script>
 
 <style lang="less" scoped>

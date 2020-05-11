@@ -16,7 +16,18 @@ Vue.config.productionTip = false; //去生产环境的提示
 Vue.component("TypeNav", TypeNav);
 Vue.component("Carousel", Carousel);
 
+// 给Vue原型对象指定事件总线对象（vm对象）
+// Vue.prototype.$bus = new Vue();
+
 new Vue({
+  // beforCreate() {
+  //   // 给Vue原型对象指定事件总线对象（当前vm对象）
+  //   Vue.prototype.$bus = this;
+  // },
+  beforeCreate() {
+    // 给Vue原型对象指定事件总线对象(当前vm对象)
+    Vue.prototype.$bus = this;
+  },
   render: (h) => h(App),
   router, //配置路由器
   store, //配置vuex的store  所有组件对象都可以通过$store属性得到store对象

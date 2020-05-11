@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div>
     <Header />
     <!-- 显示当前配置的路由 -->
     <router-view></router-view>

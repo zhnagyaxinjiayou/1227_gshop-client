@@ -23,7 +23,7 @@ const instance = axios.create({
 
 // axios请求拦截器
 instance.interceptors.request.use((config) => {
-  console.log("请求拦截器执行");
+  // console.log("请求拦截器执行");
 
   /* 2. 显示请求进度条 */
   NProgress.start();

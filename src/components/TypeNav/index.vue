@@ -190,7 +190,14 @@ export default {
         }
 
         // 跳转search
-        this.$router.push(location);
+        //如果当前在search，使用replace(),否则使用push
+        // (this.$route.path.indexOf('/search')===0)
+        //indexOf('/search')===0，字符串中的语法，或者是/search，或与它开头
+        if ((this.$route.name === "search")) {
+          this.$router.replace(location);
+        } else {
+          this.$router.push(location);
+        }
         // 隐藏一级列表
         this.hideCategorys();
       }

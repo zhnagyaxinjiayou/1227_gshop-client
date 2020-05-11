@@ -37,13 +37,10 @@
             type="text"
             id="autocomplete"
             class="input-error input-xxlarge"
+            placeholder="关键字"
             v-model="keyword"
           />
-          <button
-            class="sui-btn btn-xlarge btn-danger"
-            type="button"
-            @click="search"
-          >
+          <button class="sui-btn btn-xlarge btn-danger" @click.prevent="search">
             搜索
           </button>
         </form>
@@ -57,8 +54,20 @@ export default {
   name: "Header",
   data() {
     return {
-      keyword: "atguigu",
+      keyword: "",
     };
+  },
+  // mounted() {
+  //   // 在Header,通过事件总线绑定事件监听来接收消息，从而可以更新数据
+  //   this.$bus.$on("removeKeyword", () => {
+  //     this.keyword = "";
+  //   });
+  // },
+  mounted() {
+    // 在Header, 通过事件总线对象绑定事件监听来接收消息, 从而可以更新数据
+    this.$bus.$on("removeKeyword", () => {
+      this.keyword = "";
+    });
   },
   methods: {
     search() {
@@ -101,7 +110,14 @@ export default {
       const { query } = this.$route;
       location.query = query;
       // 跳转到Search
-      this.$router.push(location);
+      //如果当前在search，使用replace(),否则使用push
+      // (this.$route.path.indexOf('/search')===0)
+      //indexOf('/search')===0，字符串中的语法，或者是/search，或与它开头
+      if (this.$route.path.indexOf("/search") === 0) {
+        this.$router.replace(location);
+      } else {
+        this.$router.push(location);
+      }
     },
   },
 };

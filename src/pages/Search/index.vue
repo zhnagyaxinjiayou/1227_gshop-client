@@ -43,8 +43,16 @@
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{ active: isActive('1') }" @click="setOrder('1')">
+                  <a href="javascript:"
+                    >综合
+                    <li
+                      class="iconfont"
+                      :class="orderIcon"
+                      v-if="isActive('1')"
+                    ></li>
+                    <!-- <li class="iconfont iconup"></li> -->
+                  </a>
                 </li>
                 <li>
                   <a href="#">销量</a>
@@ -55,11 +63,15 @@
                 <li>
                   <a href="#">评价</a>
                 </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+                <li :class="{ active: isActive('2') }" @click="setOrder('2')">
+                  <a href="javascript:"
+                    >价格
+                    <li
+                      class="iconfont"
+                      :class="orderIcon"
+                      v-if="isActive('2')"
+                    ></li>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -73,9 +85,9 @@
               >
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="javascript:" target="_blank"
-                      ><img :src="goods.defaultImg"
-                    /></a>
+                    <router-link :to="`/detail/${goods.id}`">
+                      <img :src="goods.defaultImg" />
+                    </router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -84,7 +96,9 @@
                     </strong>
                   </div>
                   <div class="attr">
-                    <a href="javascript:">{{ goods.title }}</a>
+                    <router-link :to="`/detail/${goods.id}`">
+                      {{ goods.title }}
+                    </router-link>
                   </div>
                   <div class="commit">
                     <i class="command">已有<span>2000</span>人评价</i>
@@ -104,35 +118,13 @@
               </li>
             </ul>
           </div>
-          <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#">«上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted"><span>...</span></li>
-                <li class="next">
-                  <a href="#">下一页»</a>
-                </li>
-              </ul>
-              <div><span>共10页&nbsp;</span></div>
-            </div>
-          </div>
+          <Pagination
+            :currentPage="options.pageNo"
+            :pageSize="options.pagesize"
+            :total="productList.total"
+            :showPageNo="3"
+            @currentChange="handICurrentChange"
+          />
         </div>
       </div>
     </div>
@@ -159,9 +151,9 @@ export default {
         keyword: "", //关键字
         trademark: "", //品牌“ID:配牌名称”
         props: [], //商品属性的数组：['属性ID：属性值：属性名']实例：['2:6.0~0.25英寸：屏幕尺寸']
-        order: "1:desc", //排序方式 1：综合，2：价格:，asc:升序，desc:降序 示例：'1:desc'
+        order: "2:asc", //排序方式 1：综合，2：价格:，asc:升序，desc:降序 示例：'1:desc'
         pageNo: 1, //当前页码
-        pagesize: 10, //每页数量
+        pagesize: 5, //每页数量
       },
     };
   },
@@ -171,6 +163,12 @@ export default {
     ...mapState({
       productList: (state) => state.search.productList,
     }),
+    // 计算排序方式的icon类名
+    orderIcon() {
+      return this.options.order.split(":")[1] === "desc"
+        ? "icondown"
+        : "iconup";
+    },
   },
   // 如何监视参数的变化那？就是监视$route就可以
   watch: {
@@ -208,17 +206,70 @@ export default {
 
     // 组件一旦显示就应该发请求了，通过options里面来取数据
     // const options = this.options;
-    this.$store.dispatch("getProductList", this.options);
+    this.getProductList();
   },
 
   // 封装
   methods: {
+    // 异步获取指定页码的分页商品数据，默认指定第一页
+    getProductList(pageNo = 1) {
+      // 更新options中的pageNo
+      this.options.pageNo = pageNo;
+      // 再dispatch请求获取
+      this.$store.dispatch("getProductList", this.options);
+    },
+
+    // 当选择改变当前页码的事件监听回调
+    handICurrentChange(currentPage) {
+      // 更新options中的pageNo
+      this.options.pageNo = currentPage;
+      // 重新请求获取指定页码的数据显示
+      this.$store.dispatch("getProductList", this.options);
+    },
+    isActive(orderFlag) {
+      return this.options.order.indexOf(orderFlag) === 0;
+    },
+    // 设置新的排序
+    setOrder(flag) {
+      // "0" / "1";
+      // 得到原本的orderFlag和orderType
+      let [orderFlag, orderType] = this.options.order.split(":");
+      // 点击当前排序项: 切换排序方式
+      if (flag === orderFlag) {
+        orderType = orderType === "desc" ? "asc" : "desc";
+      } else {
+        // 点击不是当前排序项: 切换排序项, 排序方式为降序
+        orderFlag = flag;
+        orderType = "desc";
+      }
+
+      // 设置新的order值
+      this.options.order = orderFlag + ":" + orderType;
+      // 重新请求显示
+      this.$store.dispatch("getProductList", this.options);
+    },
+    // setOrder(flag) {
+    //   // 先得到原本的orderFlage和orderType
+    //   let [orderFlag, orderType] = this.options.order.split(":");
+    //   // 点击当前排序项：切换排序方式
+    //   if (flag === orderFlag) {
+    //     orderType = orderType === "desc" ? "asc" : "desc";
+    //   } else {
+    //     // 点击不是当前排序项，排序方式为降序
+    //     orderFlag = flag;
+    //     orderType = "desc";
+    //   }
+    //   // 设置新的order值
+    //   this.options.order = "";
+    //   // 重新请求数据显示
+    //   this.$store.dispatch("getProductList", this.options);
+    // },
     // 删除指定下标的属性条件
     removeprop(index) {
       // 删除对应的prop
       this.options.props.splice(index, 1);
       // 重新请求数据显示
-      this.$store.dispatch("getProductList", this.options);
+      this.getProductList();
     },
     // 添加一个属性条件
     addProp(attrId, value, attrName) {
@@ -230,21 +281,21 @@ export default {
       // 向options中的props添加一个prop
       this.options.props.push(prop);
       // 重新请求数据显示
-      this.$store.dispatch("getProductList", this.options);
+      this.getProductList();
     },
     // 设置新的品牌条件数据
     setTrademark(trademark) {
       // 更新options中的trademaek
       this.options.trademark = trademark;
       // 重新请求获取商品列表显示
-      this.$store.dispatch("getProductList", this.options);
+      this.getProductList();
     },
     // 移除分类的搜索条件
     removeTrademark() {
       // 重置trademark数据
       this.options.trademark = "";
       // 重新请求获取商品列表显示
-      this.$store.dispatch("getProductList", this.options);
+      this.getProductList();
     },
     removeCategory() {
       // 重置分类条件的数据

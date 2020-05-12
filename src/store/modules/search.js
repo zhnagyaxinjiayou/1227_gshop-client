@@ -23,7 +23,27 @@ const actions = {
     }
   },
 };
+
+// const getters = {
+//   trademarkList(state) {
+//     // 当前模块的state
+//     return state.productList.trademarkList || [];
+//   },
+//   attrList(state) {
+//     return state.productList.attrsList || [];
+//   },
+// };
+const getters = {
+  trademarkList(state) {
+    // 当前模块的state
+    return state.productList.trademarkList || [];
+  },
+
+  attrsList(state) {
+    return state.productList.attrsList || [];
+  },
+};
 // 计算属性
-const getters = {};
+// const getters = {};
 
 export default { state, mutations, actions, getters };

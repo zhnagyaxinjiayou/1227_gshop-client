@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 export default {
   name: "SearchSelector",
   props: {
@@ -47,10 +47,15 @@ export default {
   },
 
   computed: {
-    ...mapState({
-      //列表的计算属性：(state) =>state.那个模块.那个属性.这个属性里的trademarkList
-      trademarkList: (state) => state.search.productList.trademarkList, //品牌列表
-      attrList: (state) => state.search.productList.attrsList, //属性列表
+    // ...mapState({
+    //   //列表的计算属性：(state) =>state.那个模块.那个属性.这个属性里的trademarkList
+    //   trademarkList: (state) => state.search.productList.trademarkList, //品牌列表
+    //   attrList: (state) => state.search.productList.attrsList, //属性列表
+    // }),
+    // ...mapGetters(["trademarkList", "attrList"]),
+    ...mapGetters({
+      trademarkList:'trademarkList',
+      attrList:'attrsList'
     }),
   },
 };

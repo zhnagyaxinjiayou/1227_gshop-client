@@ -7,6 +7,7 @@ import App from "@/App";
 // 引入路由器
 import router from "./router";
 import store from "./store";
+import Pagination from "@/components/Pagination";
 import TypeNav from "@/components/TypeNav";
 import Carousel from "@/components/Carousel";
 import "./mock/mockServer";
@@ -15,6 +16,7 @@ Vue.config.productionTip = false; //去生产环境的提示
 // 全局注册组件
 Vue.component("TypeNav", TypeNav);
 Vue.component("Carousel", Carousel);
+Vue.component("Pagination", Pagination);
 
 // 给Vue原型对象指定事件总线对象（vm对象）
 // Vue.prototype.$bus = new Vue();

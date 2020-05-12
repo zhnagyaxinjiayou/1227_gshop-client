@@ -9,4 +9,7 @@ Vue.use(VueRouter);
 export default new VueRouter({
   mode: "history", //没有#号的模式
   routes, //配置所有路由
+  scrollBehavior(to, from, savedPosition) {
+    return { x: 0, y: 0 }; //跳转路由是滚动条自动滚动到起始位置
+  },
 });
